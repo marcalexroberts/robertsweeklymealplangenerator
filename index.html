@@ -6,118 +6,133 @@
   <title>Weekly Meal Planner V6.6.WIP</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    :root {
-      --bg-main: #f8fafc;
-      --bg-card: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --border: #e2e8f0;
-      --accent-fav: #ef4444;
-      --accent-preg: #22c55e;
-      --accent-quick: #eab308;
-      --accent-elev: #6366f1;
-      --accent-budget: #16a34a;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-main); color: var(--text-main); padding: 1.5rem; line-height: 1.5; }
-    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
-    
-    .card { background: var(--bg-card); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-    .header-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
-    h2 { font-size: 1.25rem; font-weight: 700; }
-    .subtitle { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
-    
-    ol { padding-left: 1.25rem; color: var(--text-muted); font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.25rem; }
-    .btn-text { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 0.375rem 0.75rem; border-radius: 2rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-    .btn-text:hover { background: #f1f5f9; color: var(--text-main); }
-    .btn-primary { background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 2rem; font-weight: 600; font-size: 1rem; cursor: pointer; width: 100%; transition: background 0.2s; text-align: center; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    
-    .action-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
-    .btn-group { display: flex; gap: 0.5rem; align-items: center; }
-    .btn-action { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 0.375rem 0.875rem; border-radius: 1.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .btn-action:hover { background: rgba(37, 99, 235, 0.05); }
-
-    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    label { font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.5rem; }
-    select { width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); background-color: white; font-size: 0.9rem; }
-    
-    .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; }
-    .checkbox-label { font-weight: 400; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
-    .checkbox-label input { width: 1rem; height: 1rem; }
-    
-    .legend { font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; margin-top: 0.5rem; }
-    .legend-item { display: flex; align-items: center; gap: 0.25rem; }
-
-    /* Library CSS layout */
-    .library-theme-section { margin-top: 1rem; border-top: 1px dashed var(--border); padding-top: 0.75rem; }
-    .library-theme-title { font-weight: 700; font-size: 0.95rem; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
-    .library-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.75rem; }
-    .library-item-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 0.5rem !important; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem !important; }
-    .library-item-name { font-weight: 600; font-size: 1rem !important; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.25rem; }
-    .library-item-short { font-size: 0.75rem; font-weight: normal; color: var(--text-muted); background: #e2e8f0; padding: 0.05rem 0.35rem; border-radius: 0.25rem; white-space: nowrap; }
-    .library-item-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; }
-    .library-item-controls { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem;}
-
-    .day-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
-    .day-card { display: flex; flex-direction: column; gap: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-    .day-card:last-child { border-bottom: none; padding-bottom: 0; }
-    .day-left { flex: 1; }
-    .day-title { font-weight: 700; font-size: 1.1rem; }
-    .day-theme { font-size: 0.85rem; color: var(--text-muted); font-weight: normal; }
-    .day-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-    .btn-sm { background: var(--primary); color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 1.5rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
-    .btn-sm:hover { background: var(--primary-hover); }
-    .btn-sm-outline { background: white; border: 1px solid var(--border); color: var(--text-muted); padding: 0.375rem 0.75rem; border-radius: 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; }
-    .btn-sm-outline:hover { background: #f1f5f9; color: var(--text-main); }
-
-    .day-filter-drawer { background: #f8fafc; border: 1px dashed var(--border); border-radius: 0.5rem; padding: 0.75rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
-    .day-filter-selects { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem; }
-    .day-filter-drawer label { font-size: 0.75rem; margin-bottom: 0.25rem; }
-    .day-filter-drawer select { padding: 0.25rem; font-size: 0.8rem; }
-
-    .meal-select-container { width: 100%; max-width: 400px; }
-    .tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.375rem; }
-    .tag { font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 1rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
-
-    .tag-fav { background: #fee2e2; color: #b91c1c; }
-    .tag-preg { background: #dcfce7; color: #15803d; }
-    .tag-quick { background: #fef9c3; color: #a16207; }
-    .tag-normal { background: #ffedd5; color: #c2410c; }
-    .tag-elev { background: #e0e7ff; color: #4338ca; }
-    .tag-budget { background: #dcfce7; color: #166534; }
-    .tag-time { background: #f1f5f9; color: #475569; }
-
-    .output-box { font-size: 0.95rem; color: var(--text-main); }
-    .output-box h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 1rem 0 0.25rem 0; }
-    .output-box h3:first-child { margin-top: 0; }
-    .output-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
-    .output-box ul { padding-left: 1.25rem; margin-bottom: 1rem; }
-    .output-box li { margin-bottom: 0.125rem; }
-    .output-box hr { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0; }
-
-    .hidden { display: none !important; }
-    .star-rating { display: flex; cursor: pointer; font-size: 1.1rem; color: #eab308; gap: 2px; }
-		.star-rating span {color: #d1d5db; /* Light gray for inactive */ transition: color 0.1s;}
-		.star-rating span.active { color: #eab308; /* Gold for active */}
-    .btn-fav-toggle { background: #f1f5f9; border: 1px solid var(--border); padding: 0.25rem 0.5rem; border-radius: 0.375rem; color: var(--text-muted); /* Changed from var(--accent-fav) */ font-size: 0.75rem; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
-		.btn-fav-toggle.is-fav { color: var(--accent-fav);}
+		 /* --- Root Variables --- */
+		:root {
+				--bg-main: #f8fafc;
+				--bg-card: #ffffff;
+				--text-main: #0f172a;
+				--text-muted: #64748b;
+				--primary: #2563eb;
+				--primary-hover: #1d4ed8;
+				--border: #e2e8f0;
+				--accent-fav: #ef4444;
+				--accent-preg: #22c55e;
+				--accent-quick: #eab308;
+				--accent-elev: #6366f1;
+				--accent-budget: #16a34a;
+				--accent-leftover: #b3e5fc;
+		}
 		
-    @media (min-width: 640px) {
-      .day-card { flex-direction: row; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
-      .day-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
-    }
+		/* --- Base Styles (Mobile First) --- */
+		/* --- Global Resets --- */
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-main); color: var(--text-main); padding: 1.5rem; line-height: 1.5; }
+		.container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+		.hidden { display: none !important; }
 
-    @media print {
-      body { background: white; padding: 0; }
-      .card, #instructionCard { border: none; box-shadow: none; padding: 0; }
-      .header-section, #filterContainer, .action-header, .day-list, .btn-primary, #libraryCard { display: none !important; }
-      #export-display { display: block !important; }
-    }
+		/* --- Cards & Headers --- */
+		.card { background: var(--bg-card); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+		.header-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+		h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+		h2 { font-size: 1.25rem; font-weight: 700; }
+		.subtitle { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
+		ol { padding-left: 1.25rem; color: var(--text-muted); font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.25rem; }
+
+		/* --- Buttons --- */
+		.btn-text { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 0.375rem 0.75rem; border-radius: 2rem; font-size: 0.875rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+		.btn-text:hover { background: #f1f5f9; color: var(--text-main); }
+		.btn-primary { background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 2rem; font-weight: 600; font-size: 1rem; cursor: pointer; width: 100%; transition: background 0.2s; text-align: center; }
+		.btn-primary:hover { background: var(--primary-hover); }
+		.action-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+		.btn-group { display: flex; gap: 0.5rem; align-items: center; }
+		.btn-action { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 0.375rem 0.875rem; border-radius: 1.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+		.btn-action:hover { background: rgba(37, 99, 235, 0.05); }
+		.btn-sm { background: var(--primary); color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 1.5rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+		.btn-sm:hover { background: var(--primary-hover); }
+		.btn-sm-outline { background: white; border: 1px solid var(--border); color: var(--text-muted); padding: 0.375rem 0.75rem; border-radius: 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; }
+		.btn-sm-outline:hover { background: #f1f5f9; color: var(--text-main); }
+
+		/* --- Forms & Inputs --- */
+		label { font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.5rem; }
+		select { width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); background-color: white; font-size: 0.9rem; }
+		.checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; }
+		.checkbox-label { font-weight: 400; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+		.checkbox-label input { width: 1rem; height: 1rem; }
+		.legend { font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; margin-top: 0.5rem; }
+		.legend-item { display: flex; align-items: center; gap: 0.25rem; }
+
+		/* --- Library & Day Cards --- */
+		.library-theme-section { margin-top: 1rem; border-top: 1px dashed var(--border); padding-top: 0.75rem; }
+		.library-theme-title { font-weight: 700; font-size: 0.95rem; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+		.library-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.75rem; }
+		.library-item-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 0.5rem !important; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem !important; }
+		.library-item-name { font-weight: 600; font-size: 1rem !important; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.25rem; }
+		.library-item-short { font-size: 0.75rem; font-weight: normal; color: var(--text-muted); background: #e2e8f0; padding: 0.05rem 0.35rem; border-radius: 0.25rem; white-space: nowrap; }
+		.library-item-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; }
+		.library-item-controls { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem; }
+
+		.day-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+		.day-card { display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+		.day-card-row {	display: grid; grid-template-columns: 1fr ; align-items: center; gap: 0.75rem; }
+		.day-card:last-child { border-bottom: none; padding-bottom: 0; }
+		.day-left { flex: 1; min-width: 0;}
+		.day-title { font-weight: 700; font-size: 1.1rem; }
+		.day-theme { font-size: 0.85rem; color: var(--text-muted); font-weight: normal; }
+		.day-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; width: 100%; border-top: 1px solid var(--border); padding-top: 0.5rem; margin-top: 0.25rem; }	
+		.day-filter-drawer { background: #f8fafc; border: 1px dashed var(--border); border-radius: 0.5rem; padding: 0.75rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
+		.day-filter-selects { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem; }
+		.day-filter-drawer label { font-size: 0.75rem; margin-bottom: 0.25rem; }
+		.day-filter-drawer select { padding: 0.25rem; font-size: 0.8rem; }
+		
+		.filter-grid { display: grid;	grid-template-columns: 1fr;	gap: 1rem; }
+		.meal-select-container { width: 100%; min-width: 0; max-width: 440px;}
+		
+
+		/* --- Tags & Output --- */
+		.tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.375rem; }
+		.tag { font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 1rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
+		.tag-fav { background: #fee2e2; color: #b91c1c; }
+		.tag-preg { background: #dcfce7; color: #15803d; }
+		.tag-quick { background: #fef9c3; color: #a16207; }
+		.tag-normal { background: #ffedd5; color: #c2410c; }
+		.tag-elev { background: #e0e7ff; color: #4338ca; }
+		.tag-budget { background: #dcfce7; color: #166534; }
+		.tag-time { background: #f1f5f9; color: #475569; }
+		.tag-leftover { background-color: #e8f4fd; color: #0d47a1; }
+
+		.output-box { font-size: 0.95rem; color: var(--text-main); }
+		.output-box h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 1rem 0 0.25rem 0; }
+		.output-box h3:first-child { margin-top: 0; }
+		.output-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+		.output-box ul { padding-left: 1.25rem; margin-bottom: 1rem; }
+		.output-box li { margin-bottom: 0.125rem; }
+		.output-box hr { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+		/* --- Interactive Elements --- */
+		.star-rating { display: flex; cursor: pointer; font-size: 1.1rem; color: #eab308; gap: 2px; }
+		.star-rating span { color: #d1d5db; transition: color 0.1s; }
+		.star-rating span.active { color: #eab308; }
+		.btn-fav-toggle { background: #f1f5f9; border: 1px solid var(--border); padding: 0.25rem 0.5rem; border-radius: 0.375rem; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
+		.btn-fav-toggle.is-fav { color: var(--accent-fav); }
+		
+		/* --- Tablet (640px+) --- */
+		@media (min-width: 640px) {
+			.filter-grid { grid-template-columns: repeat(2, 1fr); }
+		}
+		/* --- Desktop (1024px+) --- */
+		@media (min-width: 1024px) {
+			.filter-grid { grid-template-columns: repeat(3, 1fr); }
+			.filter-grid.preferences-row { grid-template-columns: 2fr 1fr; }
+			/* --- Desktop Layout (Horizontal) --- */
+			.day-card-row { grid-template-columns: 1fr auto; align-items: center;	gap: 1rem;}
+			.day-actions { border-top: none; padding-top: 0; margin-top: 0;	justify-content: flex-end; flex-wrap: nowrap; gap: 0.75rem; }
+		}
+
+		/* --- Mobile UI Controls --- */
+		@media (max-width: 768px) {
+			button[onclick="printFullExport()"] {	display: none !important; }
+			.day-actions { flex-wrap: wrap; }
+		}
   </style>
 </head>
 <body>
@@ -128,14 +143,14 @@
     <div class="header-section" style="margin-bottom:0;">
       <div>
         <h1>Weekly Meal Planner v6.6.WIP</h1>
-        <div class="subtitle">Preference-aware • Dynamic Theme Weights • Consecutive Protein Safe-Valve</div>
+        <div class="subtitle">Preference-Aware • Dynamic Star Rating Weight Randomizer • Consecutive Protein Conscious</div>
       </div>
       <button class="btn-text" onclick="toggleSection('instructions')">Hide instructions</button>
     </div>
     <ol id="instructionList">
       <li>Configure any global parameters inside Weekly Filters (Effort, Cost, Constraints).</li>
       <li>Use the local "Filters" button on any specific day to override weekly defaults or drill down into localized preferences.</li>
-      <li>Click "Randomize Week" to bulk generate configurations. **Meals automatically avoid repeating consecutive day proteins.**</li>
+      <li>Click "Randomize Week" to bulk generate configurations. **Meals are picked based on star weight scores and avoid repeating consecutive day proteins.**</li>
       <li>Deploy the Summary, Shopping List, or Full Print Export managers at the bottom to sync your data.</li>
     </ol>
   </div>
@@ -163,8 +178,8 @@
           <select id="globalCost" onchange="applyGlobalFilters()">
             <option value="all">All</option>
             <option value="budget">Budget 💲</option>
-            <option value="normal">Normal</option>
-            <option value="splurge">Splurge</option>
+            <option value="normal">Normal 💲💲</option>
+            <option value="splurge">Splurge 💲💲💲</option>
           </select>
         </div>
         <div>
@@ -178,38 +193,39 @@
         </div>
       </div>
 
-      <div class="filter-grid" style="grid-template-columns: 2fr 1fr;">
-        <div>
-          <label>Preferences</label>
-          <div class="checkbox-group">
-            <label class="checkbox-label"><input type="checkbox" id="filterFav" onchange="applyGlobalFilters()"> Favor favorites ★</label>
-            <label class="checkbox-label"><input type="checkbox" id="globalFavoritesToggle" onchange="applyGlobalFilters()"> Show global favorites in dropdowns</label>
-          </div>
-          
-          <label style="margin-top:0.75rem;">Protein Focus (Select Multiple)</label>
-          <div class="checkbox-group" id="proteinCheckboxGroup" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem;">
-            <label class="checkbox-label"><input type="checkbox" value="chicken" onchange="applyGlobalFilters()"> Chicken</label>
-            <label class="checkbox-label"><input type="checkbox" value="turkey" onchange="applyGlobalFilters()"> Turkey</label>
-            <label class="checkbox-label"><input type="checkbox" value="shrimp" onchange="applyGlobalFilters()"> Shrimp</label>
-            <label class="checkbox-label"><input type="checkbox" value="salmon" onchange="applyGlobalFilters()"> Salmon</label>
-            <label class="checkbox-label"><input type="checkbox" value="beef" onchange="applyGlobalFilters()"> Beef</label>
-            <label class="checkbox-label"><input type="checkbox" value="sausages" onchange="applyGlobalFilters()"> Sausages</label>
-            <label class="checkbox-label"><input type="checkbox" value="none" onchange="applyGlobalFilters()"> Vegetarian</label>
-          </div>
-        </div>
+      <div class="filter-grid preferences-row">
+    <div>
+							<label>Preferences</label>
+							<div class="checkbox-group">
+									<label class="checkbox-label"><input type="checkbox" id="filterFav" onchange="applyGlobalFilters()"> Favorites Only</label>
+									<label class="checkbox-label"><input type="checkbox" id="globalFavoritesToggle" onchange="applyGlobalFilters()"> Favorites any day</label>
+							</div>
+							
+							<label style="margin-top:0.75rem;">Protein Focus (Select Multiple)</label>
+							<div class="checkbox-group" id="proteinCheckboxGroup" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem;">
+									<label class="checkbox-label"><input type="checkbox" value="chicken" onchange="applyGlobalFilters()"> Chicken</label>
+									<label class="checkbox-label"><input type="checkbox" value="turkey" onchange="applyGlobalFilters()"> Turkey</label>
+									<label class="checkbox-label"><input type="checkbox" value="shrimp" onchange="applyGlobalFilters()"> Shrimp</label>
+									<label class="checkbox-label"><input type="checkbox" value="salmon" onchange="applyGlobalFilters()"> Salmon</label>
+									<label class="checkbox-label"><input type="checkbox" value="beef" onchange="applyGlobalFilters()"> Beef</label>
+									<label class="checkbox-label"><input type="checkbox" value="sausages" onchange="applyGlobalFilters()"> Sausages</label>
+									<label class="checkbox-label"><input type="checkbox" value="none" onchange="applyGlobalFilters()"> Vegetarian</label>
+							</div>
+					</div>
 
-        <div>
-          <label>Legend Key</label>
-          <div class="legend">
-            <div class="legend-item"><span style="color:var(--accent-fav)">★</span> Favorite</div>
-            <div class="legend-item"><span style="color:var(--accent-preg)">💗</span> Pregnancy-safe</div>
-            <div class="legend-item"><span style="color:var(--accent-quick)">⚡</span> Quick / low effort</div>
-            <div class="legend-item"><span style="color:var(--accent-elev)">🍽️</span> Elevated / special</div>
-            <div class="legend-item"><span style="color:var(--accent-budget)">💲</span> Budget Friendly</div>
-            <div class="legend-item"><span style="color:var(--text-muted)">⏱</span> Duration Target</div>
-          </div>
-        </div>
-      </div>
+					<div>
+							<label>Legend Key</label>
+							<div class="legend">
+									<div class="legend-item"><span style="color:var(--accent-fav)">★</span> Favorite</div>
+									<div class="legend-item"><span style="color:var(--accent-preg)">💗</span> Pregnancy-safe</div>
+									<div class="legend-item"><span style="color:var(--accent-quick)">⚡</span> Quick / low effort</div>
+									<div class="legend-item"><span style="color:var(--accent-elev)">🍽️</span> Elevated / special</div>
+									<div class="legend-item"><span style="color:var(--accent-budget)">💲</span> Budget Friendly</div>
+									<div class="legend-item"><span style="color:var(--accent-leftover)">🔄</span> Leftovers likely</div>
+									<div class="legend-item"><span style="color:var(--text-muted)">⏱</span> Duration Target</div>
+							</div>
+					</div>
+			</div>
     </div>
   </div>
 
@@ -220,7 +236,7 @@
       <button class="btn-text" id="toggleLibraryBtn" onclick="toggleSection('library')">Show options ▼</button>
     </div>
     <div id="libraryContainer" class="hidden" style="margin-top: 1rem;">
-      <p class="subtitle" style="margin-bottom: 0.75rem;">Total loaded meal configurations categorized by baseline recipe rules.</p>
+      <p class="subtitle" style="margin-bottom: 0.75rem;">Total loaded meal configurations categorized by baseline recipe rules. Rate meals to change randomizer weights!</p>
       <div id="libraryTarget"></div>
     </div>
   </div>
@@ -367,8 +383,8 @@ const mealBank = [
         { id: 209, name: "Birria-style chicken tacos", shortName: "Birria chicken tacos", themes: ["mexican"], rating: 3, favorite: false, manualOnly: false, leftovers: true, pregnancySafe: true, proteins: ["chicken"], protein: "chicken", description: "Tender braised chicken inside crisped tortillas dipped in spiced consomme sauce.", ingredients: ["chicken thighs", "dried chiles", "consomme", "tortillas"], effort: "elevated", cost: "normal", time: 45 },
 
         // --- WEDNESDAY: LEFTOVERS ---
-        { id: 301, name: "Leftovers (unplanned)", shortName: "Leftovers unplanned", themes: ["leftovers"], rating: 3, favorite: false, manualOnly: false, leftovers: false, pregnancySafe: false, proteins: ["none"], protein: "none", description: "Use whatever is left from earlier in the week — no cooking required.", ingredients: [], effort: "none", cost: "none", time: 0, manualOnly: true, leftovers: true },
-        { id: 302, name: "Leftovers (misc)", shortName: "Misc leftovers", themes: ["leftovers", "intentional"], rating: 3, favorite: false, manualOnly: false, leftovers: false, pregnancySafe: false, proteins: ["none"], protein: "none", description: "Catch-all leftovers night: clean out the fridge.", ingredients: [], effort: "none", cost: "none", time: 0, manualOnly: true, leftovers: true },
+        { id: 301, name: "Leftovers (unplanned)", shortName: "Leftovers unplanned", themes: ["leftovers"], rating: 3, favorite: false, manualOnly: false, leftovers: false, pregnancySafe: false, proteins: ["none"], protein: "none", description: "Use whatever is left from earlier in the week — no cooking required.", ingredients: [], effort: "none", cost: "none", time: 0},
+        { id: 302, name: "Leftovers (misc)", shortName: "Misc leftovers", themes: ["leftovers", "intentional"], rating: 3, favorite: false, manualOnly: false, leftovers: false, pregnancySafe: false, proteins: ["none"], protein: "none", description: "Catch-all leftovers night: clean out the fridge.", ingredients: [], effort: "none", cost: "none", time: 0},
 
         // --- THURSDAY: PASTA ---
         { id: 401, name: "Penne vodka", shortName: "Penne vodka", themes: ["pasta"], rating: 3, favorite: false, manualOnly: false, leftovers: true, pregnancySafe: true, proteins: ["none"], protein: "none", description: "Creamy tomato‑vodka sauce tossed with penne pasta.", ingredients: ["penne", "crushed tomatoes", "cream", "parmesan", "vodka"], effort: "normal", cost: "budget", time: 25 },
@@ -692,13 +708,10 @@ const mealBank = [
       const dayWrapper = document.createElement('div');
       dayWrapper.className = 'day-card';
 
-      const mainRow = document.createElement('div');
-      mainRow.style.display = 'flex';
-      mainRow.style.justifyContent = 'space-between';
-      mainRow.style.width = '100%';
-      mainRow.style.flexWrap = 'wrap';
-      mainRow.style.gap = '0.75rem';
-      
+      // NEW: Create the row container
+			const rowDiv = document.createElement('div');
+			rowDiv.className = 'day-card-row';
+			
       const leftDiv = document.createElement('div');
       leftDiv.className = 'day-left';
       
@@ -739,6 +752,7 @@ const mealBank = [
         if (activeMeal.effort === 'normal') metaContainer.innerHTML += `<span class="tag tag-normal">🍳 Normal</span>`;
         if (activeMeal.effort === 'elevated') metaContainer.innerHTML += `<span class="tag tag-elev">🍽️ Elevated</span>`;
         if (activeMeal.cost === 'budget') metaContainer.innerHTML += `<span class="tag tag-budget">💲 Budget</span>`;
+				if (activeMeal.leftovers === true) metaContainer.innerHTML += `<span class="tag tag-leftover">🔄 Leftovers</span>`;
         if (activeMeal.time > 0) metaContainer.innerHTML += `<span class="tag tag-time">⏱ ${activeMeal.time} mins</span>`;
       }
       leftDiv.appendChild(metaContainer);
@@ -748,6 +762,8 @@ const mealBank = [
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'day-actions';
       
+			
+			
       const filterToggleBtn = document.createElement('button');
       filterToggleBtn.className = 'btn-sm-outline';
       filterToggleBtn.textContent = state[day].showFilters ? 'Hide Filters ▲' : 'Filters ▼';
@@ -776,9 +792,11 @@ const mealBank = [
       actionsDiv.appendChild(lockLabel);
       rightDiv.appendChild(actionsDiv);
 
-      mainRow.appendChild(leftDiv);
-      mainRow.appendChild(rightDiv);
-      dayWrapper.appendChild(mainRow);
+      //changes
+			rowDiv.appendChild(leftDiv);
+			rowDiv.appendChild(rightDiv);
+			
+			dayWrapper.appendChild(rowDiv);
 
       if (state[day].showFilters) {
         const drawer = document.createElement('div');
@@ -830,7 +848,7 @@ const mealBank = [
         }
 
         const divShowDropdown = document.createElement('div');
-        divShowDropdown.innerHTML = `<label>Show Global Favs</label>`;
+        divShowDropdown.innerHTML = `<label>Show Favs</label>`;
         const selShowDropdown = document.createElement('select');
         selShowDropdown.onchange = (e) => handleDayFilterChange(day, 'showGlobalDropdown', e.target.value);
         [['inherit','Inherit defaults'], ['true','Show'], ['false','Hide']].forEach(o => {
@@ -963,24 +981,6 @@ const mealBank = [
 					if (picked) state[day].selectedId = picked.id;
 			}
 	}
-
-/*
-  function randomizeWeek() {
-    days.forEach(day => {
-      if (dayTags[day] !== 'leftovers') {
-        randomizeDay(day);
-      } else if (!state["Wednesday"].locked) {
-        const monMeal = mealBank.find(m => m.id == state["Monday"].selectedId);
-        const tueMeal = mealBank.find(m => m.id == state["Tuesday"].selectedId);
-        const hasLeftoverProducer = (monMeal && monMeal.leftovers === true) || (tueMeal && tueMeal.leftovers === true);
-        state["Wednesday"].selectedId = hasLeftoverProducer ? 20 : 202;
-      }
-    });
-
-    hideOutputs();
-    buildDayCards();
-    if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-  }*/
 
 	function computeWednesdayLeftovers() {
 			const monMeal = mealBank.find(m => m.id == state["Monday"].selectedId);
